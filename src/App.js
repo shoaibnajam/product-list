@@ -1,50 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
+
 import './App.css';
-
-const dummyData = [
-  {
-    id: 1000,
-    product: 'Tomatoes',
-    useByDate: '2024-10-03',
-  },
-  {
-    id: 2000,
-    product: 'Bread',
-    useByDate: '2024-05-05',
-  },
-  {
-    id: 3000,
-    product: 'Butter',
-    useByDate: '2024-03-24',
-  },
-  {
-    id: 4000,
-    product: 'Aubergine',
-    useByDate: '2024-08-07',
-  },
-]
-
-const today = new Date().toISOString().split('T')[0];
-
-const validateString = (input) => {
-  return input && typeof input === 'string' && input.trim() !== ""
-};
-
-const formatDate = (dateString) => {
-  if (!validateString(dateString)) {
-    return today;
-  } 
-  return dateString.split('-').reverse().join('-');
-}
+import {
+  isLocalStoragePopulated,
+  populateDummyData,
+  today,
+  validateString,
+  dummyData
+} from './helper';
+import ProductRow from './ProductRow';
 
 let productSortOrder = false;
 let dateSortOrder = false;
 
-
-const populateDummyData = (data) => {
-  window.localStorage.setItem('data', JSON.stringify(data));
+if (!isLocalStoragePopulated) {
+  populateDummyData(dummyData);
 }
-populateDummyData(dummyData);
 
 const initialLocalStorageData = JSON.parse(window.localStorage.getItem('data'));
 
@@ -54,7 +25,7 @@ const App = () => {
   const [data, setData] = useState(initialLocalStorageData);
   const [id, setId] = useState(1);
   const inputRef = useRef(null);
-  
+
   useEffect(() => {
     // Update data in localStorage
     window.localStorage.setItem('data', JSON.stringify(data));
@@ -62,19 +33,19 @@ const App = () => {
 
   const handleSubmit = e => {
     e.preventDefault();
-    
+
     // Perform validation
     if (!validateString(product) || !validateString(useByDate)) {
       inputRef.current.focus()
       return;
     }
-  
+
     // Update data state 
     setData((row) => [
       ...row,
       { id: id, product: product, useByDate: useByDate }
     ])
-    
+
     // Increment guid
     setId(prevValue => {
       return prevValue + 1;
@@ -112,13 +83,13 @@ const App = () => {
   const sortUseByDate = () => {
     // Toggle sorting order
     dateSortOrder = !dateSortOrder
-    
+
     function compareFunction(a, b) {
       return dateSortOrder ?
         new Date(a.useByDate) - new Date(b.useByDate) :
         new Date(b.useByDate) - new Date(a.useByDate);
     }
-    
+
     // Make a copy of state, sort it and perform setState
     const unsortedArray = [...data];
     const sortedArr = unsortedArray.sort(compareFunction);
@@ -150,13 +121,7 @@ const App = () => {
         {(data && data.length > 0) ? data.map(
           (row, index) => {
             return (
-              <div key={row.id} className='rowWrapper'>
-                <div className='row'>
-                  <p>{index + 1}- Name: <strong>{row.product}</strong></p>
-                  <p>Best before: <strong>{formatDate(row.useByDate)}</strong></p>
-                </div>
-                <button className='btn deleteBtn' onClick={(e) => removeProduct(e, row.id)} >Delete</button>
-              </div>
+              <ProductRow key={row.id} row={row} index={index} removeProduct={removeProduct} />
             )
           }
         ) : (<NoDataContainer />)}
