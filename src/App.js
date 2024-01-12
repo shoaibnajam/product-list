@@ -23,7 +23,7 @@ const App = () => {
   const [product, setProduct] = useState('');
   const [useByDate, setUseByDate] = useState(today);
   const [data, setData] = useState(initialLocalStorageData);
-  const [id, setId] = useState(1);
+  const [id, setId] = useState(initialLocalStorageData?.length + 1);
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -46,7 +46,7 @@ const App = () => {
       { id: id, product: product, useByDate: useByDate }
     ])
 
-    // Increment guid
+    // Increment uid
     setId(prevValue => {
       return prevValue + 1;
     });
@@ -98,16 +98,16 @@ const App = () => {
 
   const NoDataContainer = () => {
     return (
-      <div class="no-data-container">No data available</div>
+      <div class="noDataContainer">No data available</div>
     )
   }
 
   return (
     <div className="App">
-      <div className='form-container'>
+      <div className='formContainer'>
         <h1>Enter product</h1>
-        <form id="product-form" onSubmit={handleSubmit}>
-          <div className="input-group">
+        <form id="productForm" onSubmit={handleSubmit}>
+          <div className="inputGroup">
             <input type="text" placeholder="Enter Product..." value={product} onChange={e => setProduct(e.target.value)} ref={inputRef} />
             <input type="date" min={today} value={useByDate} onChange={e => setUseByDate(e.target.value)} />
           </div>
@@ -115,7 +115,7 @@ const App = () => {
         </form>
       </div>
 
-      <div className='rowHeader' ><p>Sort by: <button className='btn btn-small' onClick={sortProduct}>Product Name</button><button className='btn btn-small' onClick={sortUseByDate}>Use by Date</button></p></div>
+      <div className='rowHeader' ><p>Sort by: <button className='btn btnSmall' onClick={sortProduct}>Product Name</button><button className='btn btnSmall' onClick={sortUseByDate}>Use by Date</button></p></div>
 
       <div className='container'>
         {(data && data.length > 0) ? data.map(
